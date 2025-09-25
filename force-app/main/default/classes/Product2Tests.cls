@@ -1,10 +1,18 @@
 @isTest (seeAllData=false)
 private class Product2Tests {
+    @testSetup
+    public static void SetupTestData(){  
+        CollaborationGroup ChatterGroup = new CollaborationGroup(
+            Name = 'TEST'+ constants.INVENTORY_ANNOUNCEMENTS,  
+            CollaborationType = 'Public',
+            CanHaveGuests = false,
+            IsArchived = false,
+            IsAutoArchiveDisabled = true
+            );
 
-    /**
-     * @name product2Extension_UnitTest
-     * @description UnitTest for product2Extension
-    **/
+        insert ChatterGroup;
+    }
+    
     @isTest 
     static void Product2Extension_UnitTest(){
         PageReference pageRef = Page.Product2New;
@@ -21,7 +29,7 @@ private class Product2Tests {
             Product2Extension.ProductWrapper wrapper = ext.productsToInsert[i];
             
             Product2 testProduct = new Product2();
-            testProduct.Name = 'Test Product_' + i;
+            testProduct.Name = 'Test Product ' + i;
             testProduct.IsActive = true;
             testProduct.Initial_Inventory__c = 20;
             testProduct.Family = Constants.PRODUCT_FAMILY[0].getValue();
@@ -39,9 +47,29 @@ private class Product2Tests {
         
         ext.GetFamilyOptions();
         ext.GetInventory();
+
+        List<Product2> createdProducts = [ SELECT Id FROM Product2 ];
+        System.assertEquals(5, createdProducts.size());
+    }
+    
+   @isTest
+    static void Product2Trigger_UnitTest(){
+        TestDataFactory.InsertTestData(5); 
+          test.startTest();
         
-        List<Product2> createdProducts = [SELECT Id FROM Product2 where Name LIKE :'Test Product%'];
-            
-        System.assertEquals(5, createdProducts.size());   
+        Constants con = new Constants();
+        //con.emptyMethod(); //dummy method for constants coverage
+        //con.emptyMethod2();
+        //con.emptyMethod3();
+
+        Order rec = [select id, Status from Order limit 1];
+        Product2 prod = [SELECT Family,Id,Name,Quantity_Ordered__c,Quantity_Remaining__c FROM Product2 limit 1];
+         
+        rec.status = constants.ACTIVATED_ORDER_STATUS;      
+        Update rec;
+        Product2 updatedprod = [SELECT Family,Id,Name,Quantity_Ordered__c,Quantity_Remaining__c FROM Product2 limit 1];
+        
+        TestDataFactory.VerifyQuantityOrdered(prod,updatedprod,constants.DEFAULT_ROWS);
+        Test.stopTest();
     }
 }

@@ -1,27 +1,45 @@
 @isTest
-public class OrderTests {
+private class OrderTests {
 
-    @testSetup
-    public static void SetupTestData(){
-        TestDataFactory.InsertTestData(5);   
+    @testSetup 
+    static void SetupTestData(){
+        TestDataFactory.InsertTestData(1);
     }
 
-    static testmethod void OrderUpdate_UnitTest (){
-        test.startTest();
+    @isTest 
+    private static void OrderUpdate_UnitTest(){
+        Test.startTest();
+        Order o = [SELECT Id, Status FROM Order LIMIT 1];
+        Product2 p = [SELECT Id, Family, Name, Quantity_Ordered__c, Quantity_Remaining__c FROM Product2 LIMIT 1];
 
-        Order rec = [select id, Status from Order limit 1];
-        Product2 prod = [SELECT Family,Id,Name,Quantity_Ordered__c,Quantity_Remaining__c FROM Product2 limit 1];
+        o.status = constants.ACTIVATED_ORDER_STATUS;
+        Update o;
+        Product2 updatedp = [SELECT Id, Family, Name, Quantity_Ordered__c, Quantity_Remaining__c FROM Product2 LIMIT 1];
 
-        system.debug('kkk '+prod.Quantity_Ordered__c);
-
-        rec.status = constants.ACTIVATED_ORDER_STATUS;
-        Update rec;
-
-        Product2 updatedprod = [SELECT Family,Id,Name,Quantity_Ordered__c,Quantity_Remaining__c FROM Product2 limit 1];
-
-        system.debug('kkk '+updatedprod.Quantity_Ordered__c);
-        TestDataFactory.VerifyQuantityOrdered(prod,updatedprod,constants.DEFAULT_ROWS);
-
+        TestDataFactory.VerifyQuantityOrdered(p, updatedp, constants.DEFAULT_ROWS);
         Test.stopTest();
+    }
+
+    @isTest 
+    private static void OrderExtension_UnitTest(){
+        PageReference pageRef = Page.OrderEdit;
+        Test.setCurrentPage(pageRef);
+
+        Order o = [SELECT Id, Status FROM Order LIMIT 1];
+        ApexPages.StandardController stdcontroller = new ApexPages.StandardController(o);
+        OrderExtension ext = new OrderExtension(stdcontroller);
+        
+        System.assertEquals(1, ext.orderItemList.size());
+        ext.OnFieldChange();
+        ext.SelectFamily();
+        ext.Save();
+        ext.First();
+        ext.Next();
+        ext.Previous();
+        ext.Last();
+        ext.GetHasPrevious();
+        ext.GetHasNext();
+        ext.GetTotalPages();
+        ext.GetPageNumber();
     }
 }
