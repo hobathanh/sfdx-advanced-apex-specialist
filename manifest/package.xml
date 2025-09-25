@@ -4,6 +4,7 @@
 		<members>AnnouncementQueueable</members>
 		<members>ChartHelper</members>
 		<members>Constants</members>
+		<members>OrderExtension</members>
 		<members>OrderHelper</members>
 		<members>OrderTests</members>
 		<members>Product2Extension</members>
@@ -13,7 +14,7 @@
 		<name>ApexClass</name>
 	</types>
 	<types>
-		<members>Product2New</members>
+		<members>*</members>
 		<name>ApexPage</name>
 	</types>
 	<types>
