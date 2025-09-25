@@ -4,7 +4,10 @@
 		<members>ChartHelper</members>
 		<members>Constants</members>
 		<members>OrderHelper</members>
+		<members>OrderTests</members>
 		<members>Product2Extension</members>
+		<members>Product2Tests</members>
+		<members>TestDataFactory</members>
 		<name>ApexClass</name>
 	</types>
 	<types>
